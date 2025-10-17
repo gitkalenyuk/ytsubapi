@@ -57,7 +57,7 @@ async def get_subtitles(
         logger.info(f"Отримання субтитрів для URL: {url}, мова: {lang}")
         video_id = extract_video_id(url)
         logger.info(f"Video ID: {video_id}")
-        yt = YouTube(url)
+        yt = YouTube(url, use_po_token=True)
         captions = yt.captions
         if not captions:
             raise HTTPException(status_code=404, detail="Субтитри недоступні для цього відео")
@@ -98,7 +98,7 @@ async def get_subtitles(
 async def get_video_info(url: str = Query(..., description="YouTube URL відео")):
     try:
         video_id = extract_video_id(url)
-        yt = YouTube(url)
+        yt = YouTube(url, use_po_token=True)
         video_info = {
             "title": yt.title,
             "author": yt.author,
