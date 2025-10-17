@@ -77,8 +77,7 @@ async def get_subtitles(
             raise HTTPException(status_code=404, detail=f"Субтитри мовою '{lang}' не знайдено. Доступні мови: {available_langs}")
         subtitle_text = caption.generate_srt_captions()
         logger.info("Субтитри успішно отримано")
-        lines = subtitle_text.split('
-')
+        lines = subtitle_text.split('\n')
         clean_text = []
         for line in lines:
             line = line.strip()
