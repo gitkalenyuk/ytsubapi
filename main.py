@@ -1,6 +1,4 @@
-# Створюємо файли для проекту YouTube Subtitles API
-files_to_create = {
-    "main.py": '''from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 import re
@@ -26,8 +24,8 @@ app.add_middleware(
 
 def extract_video_id(url: str) -> str:
     patterns = [
-        r'(?:youtube\\.com\\/watch\\?v=|youtu\\.be\\/|youtube\\.com\\/embed\\/)([^&\\n?#]+)',
-        r'youtube\\.com\\/watch\\?.*v=([^&\\n?#]+)'
+        r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)',
+        r'youtube\.com\/watch\?.*v=([^&\n?#]+)'
     ]
     for pattern in patterns:
         match = re.search(pattern, url)
@@ -79,11 +77,12 @@ async def get_subtitles(
             raise HTTPException(status_code=404, detail=f"Субтитри мовою '{lang}' не знайдено. Доступні мови: {available_langs}")
         subtitle_text = caption.generate_srt_captions()
         logger.info("Субтитри успішно отримано")
-        lines = subtitle_text.split('\n')
+        lines = subtitle_text.split('
+')
         clean_text = []
         for line in lines:
             line = line.strip()
-            if (line and not line.isdigit() and not '-->' in line and not re.match(r'^\\d+$', line)):
+            if (line and not line.isdigit() and not '-->' in line and not re.match(r'^\d+$', line)):
                 clean_text.append(line)
         result = ' '.join(clean_text)
         if not result.strip():
@@ -127,97 +126,3 @@ async def get_video_info(url: str = Query(..., description="YouTube URL віде
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-''',
-    "requirements.txt": "fastapi>=0.104.1\nuvicorn[standard]>=0.24.0\npytubefix>=10.0.0\npython-multipart>=0.0.6\n",
-    "vercel.json": '''{
-  "version": 2,
-  "builds": [
-    {
-      "src": "main.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "main.py"
-    }
-  ]
-}
-''',
-    "README.md": '''# YouTube Subtitles API
-
-API для отримання субтитрів з YouTube відео за допомогою pytubefix.
-
-## Функціональність
-- Отримання субтитрів з YouTube відео
-- Підтримка різних мов
-- Автоматичне очищення тексту від тайм-кодів
-- Інформація про відео та доступні субтитри
-
-## Endpoints
-### GET /subtitles
-Отримує субтитри з YouTube відео.
-**Параметри:**
-- `url` (обов'язковий) - YouTube URL відео
-- `lang` (опціональний, за замовчуванням "en") - мова субтитрів
-**Приклад запиту:**
-GET /subtitles?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&lang=en
-**Відповідь:** Plain text з субтитрами
-
-### GET /subtitles/info
-Отримує інформацію про відео та доступні субтитри.
-**Параметри:**
-- `url` (обов'язковий) - YouTube URL відео
-**Приклад запиту:**
-GET /subtitles/info?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ
-**Відповідь:** JSON з відео та субтитрами
-
-### GET /health
-Перевірка стану API
-
-## Локальна розробка
-pip install -r requirements.txt
-python main.py
-
-## Розгортання на Vercel
-1. Завантажте файли у GitHub
-2. Під'єднайте репозиторій до Vercel
-3. Натисніть Deploy
-''',
-    ".gitignore": '''__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.vercel
-'''
-}
-
-for fname, content in files_to_create.items():
-    with open(fname, "w", encoding="utf-8") as f:
-        f.write(content)
-print("✅ Всі файли створені: main.py, requirements.txt, vercel.json, README.md, .gitignore")
